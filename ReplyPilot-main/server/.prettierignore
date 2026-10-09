@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+
+# Environment & secrets
+.env
+.env.*
+
+# Logs
+logs/
+*.log
+
+# Coverage
+coverage/
+
+# MongoDB / Redis local data
+data/
+
+# Docker
+infra/docker/
+docker-compose*.yml
+
+# Protobuf generated files (don't format generated code)
+proto/generated/
+**/*_pb.js
+**/*_grpc_pb.js
+
+# Package lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Editor
+.vscode/
+.idea/

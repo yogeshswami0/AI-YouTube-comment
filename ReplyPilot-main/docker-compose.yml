@@ -1,0 +1,121 @@
+# =============================================================================
+# ReplyPilot — Docker Compose
+# =============================================================================
+# External cloud services (MongoDB Atlas, Redis Cloud, Pinecone) are NOT
+# containerised here — services connect to them via environment variables.
+#
+# Usage:
+#   cp .env.docker .env.docker.local   # fill in real values
+#   docker compose --env-file .env.docker.local up --build
+# =============================================================================
+
+name: replypilot
+
+services:
+
+  # ─── React SPA (Vite build → Nginx) ────────────────────────────────────────
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:5000}
+    container_name: replypilot-client
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      server:
+        condition: service_healthy
+    networks:
+      - replypilot-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─── Express API Server ─────────────────────────────────────────────────────
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: replypilot-server
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./server/.env.docker
+    depends_on:
+      ai-service:
+        condition: service_healthy
+    networks:
+      - replypilot-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # ─── BullMQ Worker ──────────────────────────────────────────────────────────
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    container_name: replypilot-worker
+    restart: unless-stopped
+    env_file:
+      - ./worker/.env.docker
+    depends_on:
+      ai-service:
+        condition: service_healthy
+      rag:
+        condition: service_healthy
+    networks:
+      - replypilot-net
+
+  # ─── AI Service (FastAPI — classify + generate) ─────────────────────────────
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: replypilot-ai-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./ai-service/.env.docker
+    networks:
+      - replypilot-net
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 60s   # model loading takes time
+
+  # ─── RAG Service (FastAPI + queue consumer) ─────────────────────────────────
+  rag:
+    build:
+      context: ./rag
+      dockerfile: Dockerfile
+    container_name: replypilot-rag
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./rag/.env.docker
+    networks:
+      - replypilot-net
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 90s   # BGE model download/load on first run
+
+# ─── Shared Network ─────────────────────────────────────────────────────────
+networks:
+  replypilot-net:
+    driver: bridge
