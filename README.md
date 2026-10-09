@@ -359,5 +359,6 @@ This project is licensed under the **MIT License** — see the [LICENSE](./LICEN
 ---
 
 <p align="center">
-  Built with ❤️ by <strong>Yogesh Swami</strong>
+  Built with ❤️ by <strong>GROUP 5</strong>
+  <strong>Yogesh Swami</strong>
 </p>
