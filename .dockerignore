@@ -1,0 +1,16 @@
+node_modules
+**/node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+LICENSE
+client/
+worker/
+ai-service/
+rag/
+infra/
+infra/docker
+.vscode
+.idea
+*.log

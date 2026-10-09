@@ -1,0 +1,44 @@
+# =============================================================================
+# requirements.txt — Production dependencies (pinned for reproducibility)
+# =============================================================================
+# Install: pip install -r requirements.txt
+#
+# For GPU support, replace the torch line with:
+#   torch==2.4.1+cu121 --index-url https://download.pytorch.org/whl/cu121
+
+# ── Web Framework ─────────────────────────────────────────────────────────────
+fastapi==0.115.0
+uvicorn[standard]==0.30.6          # [standard] pulls in uvloop + httptools for speed
+starlette==0.38.2
+
+# ── Settings & Validation ─────────────────────────────────────────────────────
+pydantic==2.8.2
+pydantic-settings==2.4.0           # BaseSettings with .env file support
+
+# ── Redis ─────────────────────────────────────────────────────────────────────
+redis[hiredis]==5.0.8              # hiredis = C-based parser, ~10x faster than pure Python
+
+# ── Pinecone ──────────────────────────────────────────────────────────────────
+pinecone-client==4.1.2
+
+# ── Embedding — BGE via sentence-transformers ─────────────────────────────────
+# Supports all three BGE variants:
+#   BAAI/bge-base-en-v1.5   → 768-dim,  fast,     English only
+#   BAAI/bge-large-en-v1.5  → 1024-dim, slower,   English only, better quality
+#   BAAI/bge-m3             → 1024-dim, slowest,  multilingual (use for Hinglish)
+sentence-transformers==3.1.1
+torch==2.4.1                       # CPU build — see note above for GPU
+transformers==4.44.2
+tokenizers==0.19.1
+
+# ── Chunking ──────────────────────────────────────────────────────────────────
+tiktoken==0.7.0                    # Fast BPE tokenizer for accurate token counting
+
+# ── Logging ───────────────────────────────────────────────────────────────────
+loguru==0.7.2
+
+# ── HTTP Client ───────────────────────────────────────────────────────────────
+httpx==0.27.2                      # Used by pinecone-client and health check routes
+
+# ── Async ─────────────────────────────────────────────────────────────────────
+anyio==4.4.0

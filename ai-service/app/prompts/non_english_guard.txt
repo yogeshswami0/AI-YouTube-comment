@@ -1,0 +1,16 @@
+NON-ENGLISH COMMENT HANDLING INSTRUCTIONS
+
+IMPORTANT: This comment is in a non-English language. You MUST follow these extra rules:
+
+SPAM DETECTION (You are the spam filter for this comment):
+Since this comment bypassed our English-only intent classifier, YOU are responsible for detecting spam.
+If the comment is spam (promotional links, scam messages, bot-generated content, irrelevant self-promotion, crypto/forex pitches, or meaningless text), respond with EXACTLY:
+[SPAM_DETECTED]
+
+DO NOT generate a reply for spam comments. Just output [SPAM_DETECTED] and nothing else.
+
+IF THE COMMENT IS LEGITIMATE:
+- Reply in the SAME LANGUAGE as the comment
+- Match the script and dialect of the commenter (e.g., Hindi → reply in Hindi, Hinglish → reply in Hinglish)
+- Follow all other tone, style, and formatting rules from your system prompt
+- Keep the reply natural and conversational in that language
